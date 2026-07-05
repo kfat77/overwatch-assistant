@@ -335,10 +335,13 @@ class MultiFrameConsensus:
         
         # 韩语特殊处理：Jamo 相似度
         if self._is_korean(a.text) or self._is_korean(b.text):
-            from .korean_jamo import KoreanJamoMatcher
-            matcher = KoreanJamoMatcher()
-            if matcher.is_similar(a.text, b.text):
-                return True
+            try:
+                from .korean_jamo import KoreanJamoMatcher
+                matcher = KoreanJamoMatcher()
+                if matcher.is_similar(a.text, b.text):
+                    return True
+            except ImportError:
+                pass  # 如果 korean_jamo 模块不可用，跳过特殊处理
         
         return False
     

@@ -136,6 +136,15 @@ class OverlayWindow:
         self._clickthrough_btn.pack(side=tk.LEFT, padx=2)
         self._clickthrough_btn.bind("<Button-1>", lambda e: self._toggle_clickthrough())
         
+        # 模板按钮
+        template_btn = tk.Label(
+            btn_frame, text="📝",
+            bg='#2a2a3a', fg='#66aaff',
+            font=('Segoe UI Emoji', 10), cursor='hand2'
+        )
+        template_btn.pack(side=tk.LEFT, padx=2)
+        template_btn.bind("<Button-1>", lambda e: self._show_template_menu())
+        
         # 最小化/隐藏
         hide_btn = tk.Label(
             btn_frame, text="−", font=('Arial', 14, 'bold'),
@@ -299,6 +308,27 @@ class OverlayWindow:
             )
         
         print(f"[叠加层] 鼠标穿透: {'开启' if self._click_through else '关闭'}")
+    
+    def _show_template_menu(self) -> None:
+        """显示模板快速发送菜单"""
+        from core.chat_codes import OwChatTemplate
+        
+        menu = tk.Menu(self._root, tearoff=0, bg='#333333', fg='white')
+        
+        for key, name, desc in OwChatTemplate.list_templates():
+            plain = OwChatTemplate.get_plain_text(key)
+            menu.add_command(
+                label=f"{name}: {plain}",
+                command=lambda k=key: self._send_template(k)
+            )
+        
+        menu.post(self._root.winfo_pointerx(), self._root.winfo_pointery())
+    
+    def _send_template(self, key: str) -> None:
+        """发送模板"""
+        if self._on_reply:
+            # 使用特殊前缀标记这是模板发送
+            self._on_reply(f"__TEMPLATE__:{key}", "template")
     
     def _apply_clickthrough(self) -> None:
         """应用鼠标穿透（Windows API）"""

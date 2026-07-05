@@ -46,15 +46,16 @@ from core.hero_detector import HeroDetector, SimpleHeroTracker
 from core.glossary_service import glossary_service, quick_translate
 from core.korean_jamo import KoreanJamoMatcher
 from core.reply_assistant import ReplyAssistant
+from core.chat_codes import OwChatTemplate, PRESET_COLORS, parse_ow_code
 
 
 class OverwatchAssistant:
-    """守望先锋辅助主程序（增强版）"""
+    """守望先锋辅助主程序（完善优化版 v2.1）"""
 
     def __init__(self):
         print(f"\n{'='*50}")
-        print(f"  {app_config.app_name} v2.0.0")
-        print(f"  参考 ow-translate-lite 核心设计")
+        print(f"  {app_config.app_name} v2.1")
+        print(f"  集成 reverieach/ow-translate-lite + MapleOAO/chat-editor")
         print(f"{'='*50}\n")
 
         # 初始化模块
@@ -316,6 +317,23 @@ class OverwatchAssistant:
 
     def _on_reply_input(self, text: str, lang: str) -> None:
         """处理回话输入"""
+        # 检查是否是模板发送
+        if text.startswith("__TEMPLATE__:"):
+            template_key = text.split(":", 1)[1]
+            result = self.reply_assistant.send_template(template_key)
+            if result and result.ow_code:
+                print(f"\n[模板] {result.original}")
+                print(f"[模板] 代码: {result.ow_code}")
+                if self.overlay:
+                    self.overlay.add_reply_result(
+                        original=result.original,
+                        translated=result.ow_code,
+                        target_lang="ow_code"
+                    )
+                    if result.copied:
+                        self.overlay.add_system_message("模板代码已复制到剪贴板")
+            return
+        
         print(f"\n[回话] 中文: {text}")
         self.reply_assistant.set_target_language(lang)
         result = self.reply_assistant.translate_reply(text)
