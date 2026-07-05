@@ -85,8 +85,13 @@ class OverwatchAssistant:
             
             # 1. 初始化 OCR
             print("[初始化] 加载 OCR 引擎...")
-            self._ocr_engine = create_ocr_engine(ocr_config)
-            print("[初始化] OCR 引擎就绪")
+            try:
+                self._ocr_engine = create_ocr_engine(ocr_config)
+                print("[初始化] OCR 引擎就绪")
+            except Exception as e:
+                print(f"[初始化警告] OCR 引擎加载失败: {e}")
+                print("[初始化警告] 聊天翻译功能将不可用，请安装 Tesseract-OCR")
+                self._ocr_engine = None
             
             # 2. 启动叠加层
             print("[初始化] 启动叠加层...")
@@ -94,6 +99,11 @@ class OverwatchAssistant:
             self.overlay.start()
             time.sleep(1)  # 等待窗口启动
             print("[初始化] 叠加层已启动")
+            
+            # OCR 未就绪提示
+            if self._ocr_engine is None:
+                self.overlay.add_system_message("⚠️ OCR 未就绪 - 聊天翻译不可用")
+                self.overlay.add_system_message("请安装 Tesseract-OCR，详见 README")
             
             # 3. 注册热键
             print("[初始化] 注册热键...")
@@ -255,6 +265,8 @@ class OverwatchAssistant:
     
     def _process_chat_frame(self, img) -> None:
         """处理聊天帧"""
+        if self._ocr_engine is None:
+            return  # OCR 引擎未就绪，跳过处理
         try:
             self._stats['screenshots_processed'] += 1
             

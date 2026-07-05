@@ -57,7 +57,7 @@ class CaptureConfig:
 class OCRConfig:
     """OCR 文字识别配置"""
     # OCR 引擎选择: "easyocr" (推荐) 或 "tesseract"
-    engine: str = "easyocr"
+    engine: str = "tesseract"
     
     # 识别的语言: 英文 + 韩文
     # EasyOCR: ['en', 'ko']
