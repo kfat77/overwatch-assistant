@@ -76,6 +76,9 @@ class OCRConfig:
     
     # 二值化阈值
     binary_threshold: int = 150
+    
+    # 缓存最大大小
+    cache_max_size: int = 500
 
 
 @dataclass
@@ -88,13 +91,14 @@ class TranslateConfig:
     auto_detect: bool = True
     
     # 翻译引擎: "google", "bing", "baidu"
-    engine: str = "google"
+    engine: str = "bing"
     
     # 翻译结果最大长度
     max_translation_length: int = 200
     
     # 缓存翻译结果 (避免重复翻译)
     enable_cache: bool = True
+    cache_max_size: int = 500
     cache_max_size: int = 500
 
 
