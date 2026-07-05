@@ -9,3 +9,4 @@ pywin32>=304; sys_platform == 'win32'
 keyboard>=0.13.5
 mouse>=0.7.1
 packaging>=21.0
+pyperclip>=1.8.0
