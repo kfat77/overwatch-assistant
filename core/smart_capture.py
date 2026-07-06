@@ -154,6 +154,8 @@ class SmartCapture:
         self._callback: Optional[Callable[[np.ndarray], None]] = None
         self._region: Optional[Tuple[int, int, int, int]] = None
         self._thread: Optional[threading.Thread] = None
+        # FIX: 跟踪因差分/文字门控跳过的帧数
+        self._skipped_count = 0
     
     def set_region(self, region: Tuple[int, int, int, int]) -> None:
         self._region = region
@@ -223,6 +225,8 @@ class SmartCapture:
                     self.state_data.stable_count += 1
             
             self.state_data.last_signature = sig
+            # FIX: 空闲期跳过 OCR 计数
+            self._skipped_count += 1
             return False
         
         elif self.state == self.STATE_PROBE:
@@ -241,6 +245,8 @@ class SmartCapture:
                     # 连续多次探测无文字，回空闲
                     self.state = self.STATE_IDLE
                     self.state_data.change_count = 0
+                # FIX: 探测期无文字跳过 OCR 计数
+                self._skipped_count += 1
                 return False
         
         elif self.state == self.STATE_BURST:
@@ -314,4 +320,5 @@ class SmartCapture:
             "is_active": self.state_data.is_active,
             "stable_count": self.state_data.stable_count,
             "change_count": self.state_data.change_count,
+            "skipped_count": self._skipped_count,
         }
