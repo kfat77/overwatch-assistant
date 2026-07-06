@@ -17,7 +17,7 @@ Overwatch Assistant - Main Application (Enhanced v2.0)
     F12 - 选择英雄选择区域
     Ctrl+Shift+Q - 退出程序
 
-版本: 2.0.0 (参考 ow-translate-lite 核心设计)
+版本: 2.1.0 (参考 ow-translate-lite 核心设计)
 """
 
 import os
@@ -54,7 +54,7 @@ class OverwatchAssistant:
 
     def __init__(self):
         print(f"\n{'='*50}")
-        print(f"  {app_config.app_name} v2.1")
+        print(f"  {app_config.app_name} v{app_config.version}")
         print(f"  集成 reverieach/ow-translate-lite + MapleOAO/chat-editor")
         print(f"{'='*50}\n")
 
@@ -91,7 +91,6 @@ class OverwatchAssistant:
 
         # 绑定回调
         self.hero_tracker.on_change(self._on_team_changed)
-        self.reply_assistant.on_translation(self._on_reply_translated)
         self.capture.set_region(capture_config.chat_region)
 
     def initialize(self) -> bool:
@@ -349,10 +348,6 @@ class OverwatchAssistant:
                 if result.copied:
                     self.overlay.add_system_message("译文已复制到剪贴板")
 
-    def _on_reply_translated(self, result) -> None:
-        """回话翻译完成回调"""
-        pass
-
     def _on_toggle_overlay(self) -> None:
         """切换叠加层显示"""
         if self.overlay:
@@ -383,7 +378,7 @@ class OverwatchAssistant:
         print("\n[运行] 程序正在运行，按 Ctrl+Shift+Q 退出\n")
 
         if self.overlay:
-            self.overlay.add_system_message("守望先锋辅助 v2.0 已启动！")
+            self.overlay.add_system_message(f"守望先锋辅助 v{app_config.version} 已启动！")
             self.overlay.add_system_message("按 F11 选择聊天框区域，F10 开始翻译")
 
         try:
@@ -429,11 +424,15 @@ class OverwatchAssistant:
 
 def check_dependencies() -> bool:
     """检查依赖是否安装"""
+    # FIX: 补充 requirements.txt 中所有关键运行时依赖
     required = {
         'PIL': 'Pillow',
         'numpy': 'numpy',
         'cv2': 'opencv-python',
         'translators': 'translators',
+        'keyboard': 'keyboard',
+        'pytesseract': 'pytesseract',
+        'pyperclip': 'pyperclip',
     }
 
     missing = []

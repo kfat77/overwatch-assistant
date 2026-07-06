@@ -19,7 +19,7 @@ from typing import Dict, List, Tuple, Optional
 class AppConfig:
     """应用主配置"""
     app_name: str = "守望先锋辅助插件 Overwatch Assistant"
-    version: str = "1.0.0"
+    version: str = "2.1.0"
     debug: bool = False
     
     # 热键配置
@@ -98,7 +98,6 @@ class TranslateConfig:
     
     # 缓存翻译结果 (避免重复翻译)
     enable_cache: bool = True
-    cache_max_size: int = 500
     cache_max_size: int = 500
 
 
@@ -304,7 +303,6 @@ HERO_SYNERGIES: Dict[str, List[str]] = {
     "Brigitte": ["Reinhardt", "Tracer", "Genji", "Cassidy", "Torbjörn"],
     "Baptiste": ["Orisa", "Sigma", "Junkrat", "Roadhog", "Cassidy", "Bastion"],
     "Moira": ["Winston", "Reaper", "Genji", "Tracer"],
-    "Zenyatta": ["Genji", "Tracer", "Widowmaker"],
     "Illari": ["Orisa", "Sigma", "Soldier: 76", "Cassidy"],
     "Juno": ["D.Va", "Winston", "Pharah", "Echo"],
     "Lifeweaver": ["Genji", "Tracer", "Pharah", "Winston"],

@@ -7,10 +7,15 @@ import subprocess
 import urllib.request
 import ssl
 import time
+import shutil
 
-PROJECT_DIR = r"C:\Users\22617\Documents\kimi\workspace\overwatch-assistant"
-INSTALLER_PATH = r"C:\Users\22617\AppData\Local\Temp\python-3.11.9.exe"
-PYTHON_311 = r"C:\Program Files\Python311\python.exe"
+# FIX: 使用脚本所在目录作为项目目录，不再硬编码开发者本地路径
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+INSTALLER_PATH = os.path.join(os.environ.get('TEMP', '/tmp'), "python-3.11.9.exe")
+
+# FIX: 动态查找 Python 3.11 安装路径，而非硬编码
+PYTHON_311 = shutil.which("python3.11") or shutil.which("python311") or r"C:\Program Files\Python311\python.exe"
+
 
 def log(msg):
     print(f"\n{'='*50}")
@@ -26,9 +31,8 @@ def download():
         return True
     
     print("  正在从 python.org 下载...")
+    # FIX: 优先使用系统默认 SSL 上下文，仅在特定环境下降级
     ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
     
     req = urllib.request.Request(url)
     req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)')
@@ -41,6 +45,10 @@ def download():
         size_mb = os.path.getsize(INSTALLER_PATH) / (1024*1024)
         print(f"  下载完成: {size_mb:.1f} MB")
         return True
+    except ssl.SSLError as e:
+        print(f"  SSL 验证失败: {e}")
+        print("  请手动下载并安装 Python 3.11: https://www.python.org/downloads/release/python-3119/")
+        return False
     except Exception as e:
         print(f"  下载失败: {e}")
         return False
