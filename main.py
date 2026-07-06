@@ -388,10 +388,15 @@ class OverwatchAssistant:
                 # 定期显示统计
                 elapsed = time.time() - self._stats['start_time']
                 if int(elapsed) % 60 == 0 and self._stats['messages_translated'] > 0:
+                    # FIX: 从 SmartCapture 读取跳过的帧数
+                    capture_stats = self.capture.get_stats()
+                    self._stats['ocr_skipped'] = capture_stats.get('skipped_count', 0)
+                    
                     rate = self._stats['messages_translated'] / max(elapsed / 60, 1)
                     print(f"[统计] 运行 {int(elapsed/60)} 分钟")
                     print(f"       翻译 {self._stats['messages_translated']} 条，平均 {rate:.1f} 条/分钟")
                     print(f"       Timeline 对齐跳过 {self._stats['timeline_matched']} 条旧消息")
+                    print(f"       OCR 跳过 {self._stats['ocr_skipped']} 帧")
                     print(f"       处理截图 {self._stats['screenshots_processed']} 张")
 
         except KeyboardInterrupt:
@@ -410,12 +415,17 @@ class OverwatchAssistant:
         if self.overlay:
             self.overlay.stop()
 
+        # FIX: 从 SmartCapture 读取跳过的帧数
+        capture_stats = self.capture.get_stats()
+        self._stats['ocr_skipped'] = capture_stats.get('skipped_count', 0)
+        
         elapsed = time.time() - self._stats['start_time']
         print(f"\n{'='*50}")
         print(f"  运行时间: {int(elapsed)} 秒")
         print(f"  处理截图: {self._stats['screenshots_processed']}")
         print(f"  翻译消息: {self._stats['messages_translated']}")
         print(f"  Timeline 对齐跳过: {self._stats['timeline_matched']}")
+        print(f"  OCR 跳过: {self._stats['ocr_skipped']}")
         print(f"{'='*50}\n")
 
         print("[退出] 程序已退出")
