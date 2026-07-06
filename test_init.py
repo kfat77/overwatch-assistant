@@ -6,16 +6,23 @@ from core.ocr_engine import create_ocr_engine
 from core.translator import Translator, ChatMessageTranslator
 from core.overlay import OverlayWindow
 
+# FIX: 收集失败测试，以便 CI 能正确识别失败
+_failures = []
+
 print("="*50)
 print(f"  {app_config.app_name} v{app_config.version}")
 print("="*50)
 
 # Test 1: Screen capture
 print("\n[Test 1] Screen capture...")
-cap = ScreenCapture()
-res = cap.get_screen_resolution()
-print(f"  Screen resolution: {res[0]}x{res[1]}")
-print("  PASS")
+try:
+    cap = ScreenCapture()
+    res = cap.get_screen_resolution()
+    print(f"  Screen resolution: {res[0]}x{res[1]}")
+    print("  PASS")
+except Exception as e:
+    print(f"  FAIL: {e}")
+    _failures.append("Screen capture")
 
 # Test 2: OCR engine
 print("\n[Test 2] OCR engine...")
@@ -26,6 +33,7 @@ try:
 except Exception as e:
     print(f"  FAIL: {e}")
     print("  (This is expected if Tesseract is not installed)")
+    _failures.append("OCR engine")
 
 # Test 3: Translator
 print("\n[Test 3] Translator...")
@@ -36,6 +44,7 @@ try:
     print("  PASS")
 except Exception as e:
     print(f"  FAIL: {e}")
+    _failures.append("Translator")
 
 # Test 4: Overlay window (brief test)
 print("\n[Test 4] Overlay window...")
@@ -52,7 +61,13 @@ try:
     print("  PASS")
 except Exception as e:
     print(f"  FAIL: {e}")
+    _failures.append("Overlay window")
 
 print("\n" + "="*50)
-print("  All tests completed!")
-print("="*50)
+if _failures:
+    print(f"  {len(_failures)} test(s) FAILED: {', '.join(_failures)}")
+    print("="*50)
+    sys.exit(1)
+else:
+    print("  All tests PASSED!")
+    print("="*50)
