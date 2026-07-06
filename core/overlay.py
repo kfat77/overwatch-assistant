@@ -336,7 +336,9 @@ class OverlayWindow:
             return
         
         try:
-            hwnd = ctypes.windll.user32.GetForegroundWindow()
+            # FIX: 使用 winfo_id() 获取叠加层自身的 HWND，
+            # 而不是 GetForegroundWindow() 获取当前前台窗口
+            hwnd = self._root.winfo_id()
             # 获取当前扩展样式
             GWL_EXSTYLE = -20
             WS_EX_TRANSPARENT = 0x00000020
@@ -512,8 +514,8 @@ class OverlayWindow:
             self._messages.clear()
     
     def clear_timeline(self) -> None:
-        """清空时间线（占位，供外部调用）"""
-        pass
+        """清空时间线（委托给 clear_messages，因为消息即时间线）"""
+        self.clear_messages()
     
     def show(self) -> None:
         """显示窗口"""
