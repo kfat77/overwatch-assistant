@@ -270,6 +270,9 @@ class HeroDetector:
     def manual_input_heroes(self, prompt: str = "输入英雄名（逗号分隔）") -> List[str]:
         """
         手动输入英雄列表（模板不可用时使用）
+        
+        ⚠️ 警告：此方法调用阻塞式 input()，在 GUI 程序中会导致界面冻结。
+        建议在控制台模式或调试时使用。
         """
         print(f"\n{prompt}")
         print(f"可用英雄: {', '.join([HERO_NAME_CN.get(h, h) for h in ALL_HEROES[:10]])}...")
